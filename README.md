@@ -1,6 +1,7 @@
 # serv00保活服务 php版本
 
-在根目录添加一个`accounts.json`文件，内容如下：
+在php根目录添加一个`accounts.json`文件，内容如下：
+`~/domains/用户名.serv00.com/`
 
 ```json
 [
