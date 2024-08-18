@@ -68,7 +68,7 @@ class Cron extends Worker
                         $outputStr .= $out;
                     }
                     fclose($stream);
-                    $this->writeLog("账号: " . $account['username'] . " 执行命令: " . $account['command'] . " 输出: " . $outputStr);
+                    $this->writeLog("账号: " . $account['username'] . " 执行命令: " . $account['command'] . " 输出: \n" . $outputStr);
                 }
                 // 关闭ssh连接
                 $connection = null;
