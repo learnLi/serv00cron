@@ -40,7 +40,7 @@ class Cron extends Worker
             if (empty($account['exec_timer'])) {
                 break;
             }
-            $worker->timers[$key] = Timer::add($account['exec_timer'], function () use ($account, $worker, $key) {
+            $worker->timers[$key] = Timer::add($account['exec_timer'], function () use ($account, &$worker, $key) {
                 $connection = ssh2_connect($account['host'], $account['port'] ?? 22);
                 if (!$connection) {
                     $this->writeLog("连接失败");
@@ -64,6 +64,8 @@ class Cron extends Worker
                 }
                 // 关闭ssh连接
                 $connection = null;
+
+                $this->writeLog("\r\n");
             });
         }
     }
@@ -80,5 +82,4 @@ class Cron extends Worker
             Timer::del($timer_id);
         }
     }
-
 }
