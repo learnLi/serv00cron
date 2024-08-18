@@ -34,3 +34,6 @@ exec_timer 为执行命令的间隔时间，单位为秒
 2. 运行脚本路由：
     1. GET /serv00/start 启动
     2. GET /serv00/stop 停止
+3. 需要让serv00支持执行exec,打开serv00->www websites -> 目标网站域名 -> manage -> 打开 GZIP compression、 Force SSL 、 Allow PHP exec() function 按钮
+4. 打开serv00->www websites -> 目标网站域名 -> manage -> Open Basedir directories
+   1. 把开头这串字符 `/usr/home/用户名/domains/用户名.serv00.net/public_html:` 改成 `/usr/home/用户名/domains/用户名.serv00.net:`，即删除/public_html即可， 然后保存

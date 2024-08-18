@@ -18,7 +18,8 @@ class Cron extends Worker
         if (!file_exists($logFilePath)) {
             mkdir($logFilePath, 0777, true);
         }
-        $logFile = $logFilePath . DIRECTORY_SEPARATOR . 'cron.log';
+        $dateToday = date('Ymd');
+        $logFile = $logFilePath . DIRECTORY_SEPARATOR . 'cron_'. $dateToday.'.log';
         $this->logFilePath = $logFile;
         $this->onWorkerStart = array($this, 'onWorkerStart');
     }
@@ -76,7 +77,11 @@ class Cron extends Worker
 
     private function writeLog($message)
     {
-        file_put_contents($this->logFilePath, $message . PHP_EOL, FILE_APPEND | LOCK_EX);
+        // 获取当前的时间，并格式化为 "YYYY-MM-DD HH:MM:SS"
+        $timestamp = date('Y-m-d H:i:s');
+        // 将时间戳和消息合并
+        $fullMessage = "[ $timestamp ] - $message";
+        file_put_contents($this->logFilePath, $fullMessage . PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 
     public function onWorkerStop(Worker $worker)
