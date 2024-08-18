@@ -19,9 +19,10 @@ class Cron extends Worker
             mkdir($logFilePath, 0777, true);
         }
         $dateToday = date('Ymd');
-        $logFile = $logFilePath . DIRECTORY_SEPARATOR . 'cron_'. $dateToday.'.log';
+        $logFile = $logFilePath . DIRECTORY_SEPARATOR . 'cron_' . $dateToday . '.log';
         $this->logFilePath = $logFile;
         $this->onWorkerStart = array($this, 'onWorkerStart');
+        $this->onWorkerStop = array($this, 'onWorkerStop');
     }
 
     public function onWorkerStart(Worker $worker)
@@ -48,29 +49,29 @@ class Cron extends Worker
             $worker->timers[$key] = Timer::add($account['exec_timer'], function () use ($account, &$worker, $key) {
                 $connection = ssh2_connect($account['host'], $account['port'] ?? 22);
                 if (!$connection) {
-                    $this->writeLog("连接失败");
+                    $this->writeLog("账号：" . $account['username'] . " 连接失败");
                     Timer::del($worker->timers[$key]);
                     return;
                 }
                 if (!ssh2_auth_password($connection, $account['username'], $account['password'])) {
-                    $this->writeLog("账号密码错误");
+                    $this->writeLog("账号：" . $account['username'] . " 账号密码错误");
                     Timer::del($worker->timers[$key]);
                     return;
                 }
 
-                $this->writeLog("定时任务运行中...");
+                $this->writeLog("账号: " . $account['username'] . " 连接成功");
                 if ($account['command'] != "") {
+                    $outputStr = "";
                     $stream = ssh2_exec($connection, $account['command']);
                     stream_set_blocking($stream, true);
                     while ($out = fread($stream, 4096)) {
-                        echo $out;
+                        $outputStr .= $out;
                     }
                     fclose($stream);
+                    $this->writeLog("账号: " . $account['username'] . " 执行命令: " . $account['command'] . " 输出: " . $outputStr);
                 }
                 // 关闭ssh连接
                 $connection = null;
-
-                $this->writeLog("\r\n");
             });
         }
     }
