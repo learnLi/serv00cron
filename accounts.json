@@ -1,0 +1,10 @@
+[
+  {
+    "host": "",
+    "port": 6379,
+    "username": "xxxx",
+    "password" : "xxxx",
+    "command": "",
+    "exec_timer": 2
+  }
+]
