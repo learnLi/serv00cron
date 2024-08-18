@@ -14,8 +14,12 @@ class Cron extends Worker
     {
         parent::__construct($socket_name, $context_option);
         // 定义 log 文件路径
-        $logFilePath = root_path() . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'cron.log';
-        $this->logFilePath = $logFilePath;
+        $logFilePath = root_path() . 'logs';
+        if (!file_exists($logFilePath)) {
+            mkdir($logFilePath, 0777, true);
+        }
+        $logFile = $logFilePath . DIRECTORY_SEPARATOR . 'cron.log';
+        $this->logFilePath = $logFile;
         $this->onWorkerStart = array($this, 'onWorkerStart');
     }
 
