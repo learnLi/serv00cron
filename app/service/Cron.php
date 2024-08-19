@@ -43,7 +43,6 @@ class Cron extends Worker
                 break;
             }
             $worker->timers[$key] = Timer::add($account['exec_timer'], function () use ($account, &$worker, $key) {
-                $this->updateLogPath();
                 $connection = ssh2_connect($account['host'], $account['port'] ?? 22);
                 if (!$connection) {
                     $this->writeLog("账号：" . $account['username'] . " 连接失败");
