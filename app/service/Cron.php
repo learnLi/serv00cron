@@ -8,7 +8,6 @@ use think\Config;
 
 class Cron extends Worker
 {
-    public $logFilePath;
 
     public function __construct($socket_name = '', array $context_option = array())
     {
@@ -18,9 +17,6 @@ class Cron extends Worker
         if (!file_exists($logFilePath)) {
             mkdir($logFilePath, 0777, true);
         }
-        $dateToday = date('Ymd');
-        $logFile = $logFilePath . DIRECTORY_SEPARATOR . 'cron_' . $dateToday . '.log';
-        $this->logFilePath = $logFile;
         $this->onWorkerStart = array($this, 'onWorkerStart');
         $this->onWorkerStop = array($this, 'onWorkerStop');
     }
@@ -47,6 +43,7 @@ class Cron extends Worker
                 break;
             }
             $worker->timers[$key] = Timer::add($account['exec_timer'], function () use ($account, &$worker, $key) {
+                $this->updateLogPath();
                 $connection = ssh2_connect($account['host'], $account['port'] ?? 22);
                 if (!$connection) {
                     $this->writeLog("账号：" . $account['username'] . " 连接失败");
@@ -76,13 +73,17 @@ class Cron extends Worker
         }
     }
 
+    private function getLogPath(): string
+    {
+        return root_path() . 'logs' . DIRECTORY_SEPARATOR . 'cron_' . date('Ymd') . '.log';
+    }
+
     private function writeLog($message)
     {
         // 获取当前的时间，并格式化为 "YYYY-MM-DD HH:MM:SS"
-        $timestamp = date('Y-m-d H:i:s');
         // 将时间戳和消息合并
-        $fullMessage = "[ $timestamp ] - $message";
-        file_put_contents($this->logFilePath, $fullMessage . PHP_EOL, FILE_APPEND | LOCK_EX);
+        $fullMessage = "[ {${date('Y-m-d H:i:s')}} ] - $message";
+        file_put_contents($this->getLogPath(), $fullMessage . PHP_EOL, FILE_APPEND | LOCK_EX);
     }
 
     public function onWorkerStop(Worker $worker)
