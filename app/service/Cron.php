@@ -11,7 +11,7 @@ class Cron extends Worker
 {
     private string $tg_bot_token;
 
-    private int $tg_chat_id;
+    private int $chat_id;
 
     public function __construct($socket_name = '', array $context_option = array())
     {
@@ -27,7 +27,7 @@ class Cron extends Worker
 
     public function onWorkerStart(Worker $worker)
     {
-        $this->tg_chat_id = env('TG_CHAT_ID', null);
+        $this->chat_id = env('CHAT_ID', null);
         $this->tg_bot_token = env('TG_BOT_TOKEN', null);
         $worker->timers = [];
         // 读取accounts.json
@@ -86,10 +86,11 @@ class Cron extends Worker
     private function writeLog($message)
     {
         // 获取当前的时间，并格式化为 "YYYY-MM-DD HH:MM:SS"
+        $timestamp = date('Y-m-d H:i:s');
         // 将时间戳和消息合并
-        $fullMessage = "[ {${date('Y-m-d H:i:s')}} ] - $message";
+        $fullMessage = "[ $timestamp ] - $message";
         # 判断是否配置了tg_bot_token和chat_id ，如果配置了，则发送到tg ，否则写入到日志文件
-        if (!empty($this->tg_bot_token && $this->tg_chat_id)) {
+        if (!empty($this->tg_bot_token && $this->chat_id)) {
             $response = $this->botSend($fullMessage);
             if ($response === false) {
                 $response = "TG机器人发送失败";
