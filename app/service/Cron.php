@@ -11,7 +11,7 @@ class Cron extends Worker
 {
     private string $tg_bot_token;
 
-    private int $chat_id;
+    private int $tg_chat_id;
 
 
     public function __construct($socket_name = '', array $context_option = array())
@@ -28,7 +28,7 @@ class Cron extends Worker
 
     public function onWorkerStart(Worker $worker)
     {
-        $this->chat_id = env('TG_CHAT_ID', null);
+        $this->tg_chat_id = env('TG_CHAT_ID', null);
         $this->tg_bot_token = env('TG_BOT_TOKEN', null);
         $worker->timers = [];
         // 读取accounts.json
@@ -91,7 +91,7 @@ class Cron extends Worker
         // 将时间戳和消息合并
         $fullMessage = "[ $timestamp ] - $message";
         # 判断是否配置了tg_bot_token和chat_id ，如果配置了，则发送到tg ，否则写入到日志文件
-        if (!empty($this->tg_bot_token && $this->chat_id)) {
+        if (!empty($this->tg_bot_token && $this->tg_chat_id)) {
             $response = $this->botSend($fullMessage);
             if ($response === false) {
                 $response = "TG机器人发送失败";
@@ -105,7 +105,7 @@ class Cron extends Worker
     private function botSend($msg): bool|string
     {
         $payload = [
-            'chat_id' => $this->chat_id,
+            'chat_id' => $this->tg_chat_id,
             'text' => $msg,
             'reply_markup' => [
                 'inline_keyboard' => [
@@ -118,20 +118,15 @@ class Cron extends Worker
         ];
         try {
             $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.telegram.org/bot{$this->tg_bot_token}/sendMessage",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($payload),
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json'
-                ),
-            ));
+            curl_setopt($curl, CURLOPT_URL, "https://api.telegram.org/bot{$this->tg_bot_token}/sendMessage");
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+            ]);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+
             $response = curl_exec($curl);
             $err = curl_error($curl);
             if ($err) {
