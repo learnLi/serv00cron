@@ -13,6 +13,7 @@ class Cron extends Worker
 
     private int $chat_id;
 
+
     public function __construct($socket_name = '', array $context_option = array())
     {
         parent::__construct($socket_name, $context_option);
