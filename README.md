@@ -57,5 +57,17 @@ exec_timer 为执行命令的间隔时间，单位为秒
 ```
 APP_DEBUG=true # 是否开启debug
 
+TG_CHAT_ID=xxx # tg_chat_id
+
+TG_BOT_TOKEN=xxx # tg_bot_token
+
 CRON_STOP=true # 是否运行pc端停止服务
 ```
+
+创建 Telegram Bot
+
+在 Telegram 中找到 @BotFather，创建一个新 Bot，并获取 API Token。
+
+获取到你的 Chat ID 
+
+可以通过向 Bot 发送一条消息，然后访问 https://api.telegram.org/bot<your_bot_token>/getUpdates 找到 Chat ID。
