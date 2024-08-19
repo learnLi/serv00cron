@@ -110,8 +110,10 @@ class Cron extends Worker
             'reply_markup' => [
                 'inline_keyboard' => [
                     [
-                        "text" => "问题反馈？",
-                        "url" => "https://t.me/xxxx"
+                        [
+                            "text" => "问题反馈？",
+                            "url" => "https://t.me/xxxx"
+                        ]
                     ]
                 ]
             ]
