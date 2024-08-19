@@ -27,7 +27,7 @@ class Cron extends Worker
 
     public function onWorkerStart(Worker $worker)
     {
-        $this->chat_id = env('CHAT_ID', null);
+        $this->chat_id = env('TG_CHAT_ID', null);
         $this->tg_bot_token = env('TG_BOT_TOKEN', null);
         $worker->timers = [];
         // 读取accounts.json
